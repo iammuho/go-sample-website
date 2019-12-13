@@ -18,6 +18,8 @@ Written by Muhammet Arslan <github.com/geass>, December 2019
 
 package config
 
+import "time"
+
 // Config stores configuration values
 var Config *config
 
@@ -28,5 +30,16 @@ type config struct {
 		Name        string `env:"GOSAMPLE_APPLICATION_NAME"     envDefault:"go-sample-website"`
 		Environment string `env:"GOSAMPLE_APPLICATION_ENVIRONMENT"     envDefault:"development"`
 		Version     string `env:"GOSAMPLE_APPLICATION_VERSION"     envDefault:"1.0"`
+	}
+
+	// HTTPServer provides the HTTP server configuration.
+	HTTPServer struct {
+		Listen string `env:"GOSAMPLE_SERVER_LISTEN"     envDefault:"0.0.0.0:6060"`
+
+		ReadTimeout          time.Duration `env:"GOSAMPLE_SERVER_READ_TIMEOUT" envDefault:"5s"`
+		WriteTimeout         time.Duration `env:"GOSAMPLE_SERVER_WRITE_TIMEOUT" envDefault:"5s"`
+		MaxConnsPerIP        int           `env:"GOSAMPLE_SERVER_MAX_CONN_PER_IP" envDefault:"50"`
+		MaxRequestsPerConn   int           `env:"GOSAMPLE_SERVER_MAX_REQUESTS_PER_CONN" envDefault:"10"`
+		MaxKeepaliveDuration time.Duration `env:"GOSAMPLE_SERVER_MAX_KEEP_ALIVE_DURATION" envDefault:"5s"`
 	}
 }

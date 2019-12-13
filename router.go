@@ -16,19 +16,19 @@ limitations under the License.
 Written by Muhammet Arslan <github.com/geass>, December 2019
 */
 
-package config
+package main
 
 import (
-	"github.com/caarlos0/env"
+	"github.com/buaazp/fasthttprouter"
+	"github.com/valyala/fasthttp"
 )
 
-func init() {
-	Config = &config{}
+func registerRouter() fasthttp.RequestHandler {
 
-	if err := env.Parse(&Config.Application); err != nil {
-		panic(err)
-	}
-	if err := env.Parse(&Config.HTTPServer); err != nil {
-		panic(err)
-	}
+	router := fasthttprouter.New()
+
+	// Mount the Index
+	router.GET("/", Index())
+
+	return router.Handler
 }

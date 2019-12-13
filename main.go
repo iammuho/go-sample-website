@@ -18,9 +18,16 @@ Written by Muhammet Arslan <github.com/geass>, December 2019
 
 package main
 
+//go:generate qtc -dir=templates -ext=html
+
 import (
+	"sync"
+
 	"github.com/geass/go-sample-website/config"
+	"github.com/geass/go-sample-website/pkg/http"
 	"github.com/geass/go-sample-website/pkg/logger"
+
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -29,5 +36,35 @@ func main() {
 	logger := logger.New(config.Config.Application.Name, config.Config.Application.Environment)
 
 	// Debug Log
-	logger.Debug("Application is Started")
+	logger.Debug("Debug! This will not be seen if environment is 'production'")
+
+	// Register the router
+	handler := registerRouter()
+
+	// Implement the HTTP Server
+	httpServer := http.New(
+		http.WithAddress(config.Config.HTTPServer.Listen),
+		http.WithHandler(handler),
+		http.WithReadTimeout(config.Config.HTTPServer.ReadTimeout),
+		http.WithWriteTimeout(config.Config.HTTPServer.WriteTimeout),
+		http.WithMaxConnsPerIP(config.Config.HTTPServer.MaxConnsPerIP),
+		http.WithMaxRequestsPerConn(config.Config.HTTPServer.MaxRequestsPerConn),
+		http.WithMaxKeepaliveDuration(config.Config.HTTPServer.MaxKeepaliveDuration),
+	)
+
+	// Start the HTTP server
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		logger.Info(
+			"HTTP Server is running...",
+			zap.String("Address", config.Config.HTTPServer.Listen),
+		)
+
+		defer wg.Done()
+		httpServer.Start()
+	}()
+
+	wg.Wait()
 }

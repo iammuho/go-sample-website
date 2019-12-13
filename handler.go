@@ -16,19 +16,24 @@ limitations under the License.
 Written by Muhammet Arslan <github.com/geass>, December 2019
 */
 
-package config
+package main
 
 import (
-	"github.com/caarlos0/env"
+	"github.com/geass/go-sample-website/templates/index"
+	"github.com/geass/go-sample-website/templates/layout"
+
+	"github.com/valyala/fasthttp"
 )
 
-func init() {
-	Config = &config{}
+// Index function renders the dashboard index page
+func Index() fasthttp.RequestHandler {
+	return func(ctx *fasthttp.RequestCtx) {
 
-	if err := env.Parse(&Config.Application); err != nil {
-		panic(err)
-	}
-	if err := env.Parse(&Config.HTTPServer); err != nil {
-		panic(err)
+		ctx.SetContentType("text/html")
+
+		p := &index.IndexPage{
+			CTX: ctx,
+		}
+		layout.WriteBaseLayout(ctx, p)
 	}
 }
